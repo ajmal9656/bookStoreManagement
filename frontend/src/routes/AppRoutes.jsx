@@ -1,13 +1,17 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import BookList from "../pages/BookList";
+import MainLayout from "../layout/MainLayout";
 
 
 export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<BookList />} />
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Navigate to="/books" replace />} />
+          <Route path="/books" element={<BookList />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
