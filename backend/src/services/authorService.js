@@ -59,3 +59,19 @@ export const createAuthor = async ({ name, bio }) => {
   return author.toJSON();
 };
 
+export const deleteAuthor = async (id) => {
+  const author = await authorRepository.findById(id);
+
+  if (!author) {
+    throw new ApiError(404, "Author not found.");
+  }
+
+  const deleted = await authorRepository.deleteAuthor(id);
+
+  if (!deleted) {
+    throw new ApiError(
+      409,
+      "Cannot delete author because the author has books."
+    );
+  }
+};

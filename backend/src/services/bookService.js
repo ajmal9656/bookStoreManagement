@@ -100,6 +100,7 @@ if (titleExists) {
 };
 
 
+
 export const getBookById = async (id) => {
   const book = await bookRepository.getBookWithAuthorById(id);
 

@@ -44,3 +44,16 @@ export const createAuthor = async (req, res, next) => {
   }
 };
 
+export const deleteAuthor = async (req, res, next) => {
+  try {
+    await authorService.deleteAuthor(req.params.id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Author deleted successfully.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

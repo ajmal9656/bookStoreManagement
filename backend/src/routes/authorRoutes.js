@@ -1,7 +1,7 @@
 import express from "express";
 import validate from "../middlewares/validationMiddleware.js";
 import * as authorController from '../controllers/authorController.js'
-import { createAuthorSchema, listAuthorsSchema, searchAuthorsSchema } from "../validations/authorValidations.js";
+import { createAuthorSchema, idParamSchema, listAuthorsSchema, searchAuthorsSchema } from "../validations/authorValidations.js";
 
 const router = express.Router();
 
@@ -21,6 +21,12 @@ router.post(
   "/",
   validate(createAuthorSchema, "body"),
   authorController.createAuthor
+);
+
+router.delete(
+  "/:id",
+  validate(idParamSchema, "params"),
+  authorController.deleteAuthor
 );
 
 

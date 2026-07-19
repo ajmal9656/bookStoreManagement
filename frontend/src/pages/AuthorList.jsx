@@ -71,31 +71,31 @@ const AuthorList = () => {
   };
 
   const handleDeleteAuthor = async (id) => {
-    const result = await Swal.fire({
-      title: "Delete Author?",
-      text: "This action cannot be undone.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Delete",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#d33",
-    });
+  const result = await Swal.fire({
+    title: "Delete Author?",
+    text: "This action cannot be undone.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Delete",
+    cancelButtonText: "Cancel",
+    confirmButtonColor: "#d33",
+  });
 
-    if (!result.isConfirmed) return;
+  if (!result.isConfirmed) return;
 
-    try {
-      await deleteAuthor(id);
+  try {
+    await deleteAuthor(id);
 
-      toast.success("Author deleted successfully.");
+    toast.success("Author deleted successfully.");
 
-      await loadAuthors();
-    } catch (error) {
-      toast.error(
-        error.response?.data?.error?.message ||
-          "Failed to delete author."
-      );
-    }
-  };
+    await loadAuthors();
+  } catch (error) {
+    toast.error(
+      error.response?.data?.error?.message ||
+      "Failed to delete author."
+    );
+  }
+};
 
   const handleCloseAuthorModal = async (refresh = false) => {
     if (refresh) {

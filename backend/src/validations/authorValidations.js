@@ -70,3 +70,16 @@ export const createAuthorSchema = Joi.object({
       "any.required": "Bio is required.",
     }),
 });
+
+export const idParamSchema = Joi.object({
+  id: Joi.number()
+    .integer()
+    .positive()
+    .required()
+    .messages({
+      "number.base": "Invalid author id.",
+      "number.integer": "Invalid author id.",
+      "number.positive": "Invalid author id.",
+      "any.required": "Author id is required.",
+    }),
+});

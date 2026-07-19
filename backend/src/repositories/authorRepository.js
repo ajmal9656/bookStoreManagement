@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { Author } from "../models/index.js";
+import { Author,Book } from "../models/index.js";
 
 export const getAuthors = async ({
   search,
@@ -48,4 +48,27 @@ export const getAuthors = async ({
 
 export const create = async (data) => {
   return Author.create(data);
+};
+
+export const findById = async (id) => {
+  return Author.findByPk(id);
+};
+
+
+export const deleteAuthor = async (id) => {
+  const bookCount = await Book.count({
+    where: {
+      authorId: id,
+    },
+  });
+
+  if (bookCount > 0) {
+    return false;
+  }
+
+  return await Author.destroy({
+    where: {
+      id,
+    },
+  });
 };
