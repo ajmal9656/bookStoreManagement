@@ -183,22 +183,22 @@ const AddBookModal = ({ open, onClose, onSubmit }) => {
 
           <input
             type="text"
-            inputMode="numeric"
+            inputMode="decimal"
             placeholder="Price"
             {...register("price", {
               required: "Price is required",
               pattern: {
-                value: /^\d+$/,
-                message: "Price must be a valid number",
+                value: /^\d+(\.\d{1,2})?$/,
+                message: "Enter a valid price",
               },
               validate: (value) =>
-                Number(value) >= 1 || "Price must be positive",
-              setValueAs: (value) => Number(value),
+                parseFloat(value) > 0 || "Price must be positive",
+              setValueAs: (value) => parseFloat(value),
               onChange: (e) => {
                 const value = e.target.value;
 
-                if (!/^\d*$/.test(value)) {
-                  e.target.value = value.replace(/\D/g, "");
+                if (!/^\d*\.?\d{0,2}$/.test(value)) {
+                  e.target.value = value.slice(0, -1);
                 }
               },
             })}

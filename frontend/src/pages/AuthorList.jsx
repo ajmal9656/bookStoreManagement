@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import Button from "../components/Button";
 import Loader from "../components/Loader";
 import AddAuthorModal from "../components/Modals/AddAuthorModal";
+import { useNavigate } from "react-router-dom";
 
 import {
   getAuthorList,
@@ -29,13 +30,15 @@ const AuthorList = () => {
 
   const debouncedSearch = useDebounce(search, 500);
 
+  const navigate = useNavigate();
+
   const loadAuthors = async () => {
     try {
       setLoading(true);
 
       const params = {
         page,
-        limit:5
+        limit: 5,
       };
 
       if (debouncedSearch.trim()) {
@@ -48,8 +51,7 @@ const AuthorList = () => {
       setTotalPages(response.data.totalPages);
     } catch (error) {
       toast.error(
-        error.response?.data?.error?.message ||
-          "Failed to load authors."
+        error.response?.data?.error?.message || "Failed to load authors.",
       );
     } finally {
       setLoading(false);
@@ -71,31 +73,30 @@ const AuthorList = () => {
   };
 
   const handleDeleteAuthor = async (id) => {
-  const result = await Swal.fire({
-    title: "Delete Author?",
-    text: "This action cannot be undone.",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "Delete",
-    cancelButtonText: "Cancel",
-    confirmButtonColor: "#d33",
-  });
+    const result = await Swal.fire({
+      title: "Delete Author?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#d33",
+    });
 
-  if (!result.isConfirmed) return;
+    if (!result.isConfirmed) return;
 
-  try {
-    await deleteAuthor(id);
+    try {
+      await deleteAuthor(id);
 
-    toast.success("Author deleted successfully.");
+      toast.success("Author deleted successfully.");
 
-    await loadAuthors();
-  } catch (error) {
-    toast.error(
-      error.response?.data?.error?.message ||
-      "Failed to delete author."
-    );
-  }
-};
+      await loadAuthors();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.error?.message || "Failed to delete author.",
+      );
+    }
+  };
 
   const handleCloseAuthorModal = async (refresh = false) => {
     if (refresh) {
@@ -106,9 +107,7 @@ const AuthorList = () => {
   };
 
   const handleViewAuthor = (id) => {
-    console.log("View Author:", id);
-
-    // We'll implement ViewAuthorModal later
+    navigate(`/authors/${id}`);
   };
 
   return (
@@ -128,9 +127,7 @@ const AuthorList = () => {
           />
         </div>
 
-        <Button onClick={() => setOpenAuthorModal(true)}>
-          Add Author
-        </Button>
+        <Button onClick={() => setOpenAuthorModal(true)}>Add Author</Button>
       </div>
 
       <table>
@@ -181,9 +178,7 @@ const AuthorList = () => {
 
                   <Button
                     variant="danger"
-                    onClick={() =>
-                      handleDeleteAuthor(author.id)
-                    }
+                    onClick={() => handleDeleteAuthor(author.id)}
                   >
                     Delete
                   </Button>

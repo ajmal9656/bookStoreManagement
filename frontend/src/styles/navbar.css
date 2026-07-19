@@ -1,4 +1,6 @@
 .navbar {
+  position: relative;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -13,6 +15,10 @@
 }
 
 .nav-links {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
   display: flex;
   gap: 20px;
 }

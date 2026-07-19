@@ -47,8 +47,7 @@ const AddAuthorModal = ({ open, onClose, onSubmit }) => {
       }
 
       toast.error(
-        error.response?.data?.error?.message ||
-          "Something went wrong."
+        error.response?.data?.error?.message || "Something went wrong.",
       );
     }
   };
@@ -75,9 +74,7 @@ const AddAuthorModal = ({ open, onClose, onSubmit }) => {
             })}
           />
 
-          {errors.name && (
-            <p className="error">{errors.name.message}</p>
-          )}
+          {errors.name && <p className="error">{errors.name.message}</p>}
 
           <textarea
             rows="5"
@@ -95,9 +92,7 @@ const AddAuthorModal = ({ open, onClose, onSubmit }) => {
             })}
           />
 
-          {errors.bio && (
-            <p className="error">{errors.bio.message}</p>
-          )}
+          {errors.bio && <p className="error">{errors.bio.message}</p>}
 
           <div className="modal-buttons">
             <Button
@@ -108,10 +103,7 @@ const AddAuthorModal = ({ open, onClose, onSubmit }) => {
               Cancel
             </Button>
 
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-            >
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Saving..." : "Save"}
             </Button>
           </div>

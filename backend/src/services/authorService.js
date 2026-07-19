@@ -14,10 +14,7 @@ export const searchAuthors = async ({ search }) => {
 export const getAuthors = async (query) => {
   const page = Math.max(1, Number(query.page) || 1);
 
-  const limit = Math.min(
-    50,
-    Math.max(1, Number(query.limit) || 5)
-  );
+  const limit = Math.min(50, Math.max(1, Number(query.limit) || 5));
 
   const search = query.search?.trim();
   const result = await authorRepository.getAuthors({
@@ -26,8 +23,7 @@ export const getAuthors = async (query) => {
     limit,
     paginate: true,
   });
-  console.log("res",result);
-  
+  console.log("res", result);
 
   return {
     ...result,
@@ -41,14 +37,11 @@ export const createAuthor = async ({ name, bio }) => {
   const authorExists = await checkFieldValueExist(
     "Author",
     "name",
-    trimmedName
+    trimmedName,
   );
 
   if (authorExists) {
-    throw new ApiError(
-      409,
-      "An author with this name already exists."
-    );
+    throw new ApiError(409, "An author with this name already exists.");
   }
 
   const author = await authorRepository.create({
@@ -71,7 +64,32 @@ export const deleteAuthor = async (id) => {
   if (!deleted) {
     throw new ApiError(
       409,
-      "Cannot delete author because the author has books."
+      "Cannot delete author because the author has books.",
     );
   }
+};
+
+export const getAuthorById = async (id, query) => {
+  const page = Math.max(1, Number(query.page) || 1);
+
+  const limit = Math.min(50, Math.max(1, Number(query.limit) || 5));
+
+  const author = await authorRepository.findById(id);
+
+  if (!author) {
+    throw new ApiError(404, "Author not found.");
+  }
+
+  const { books, totalBooks } = await authorRepository.getBooksByAuthor(
+    id,
+    page,
+    limit,
+  );
+
+  return {
+    author: author.toJSON(),
+    books,
+    page: Number(page),
+    totalPages: Math.ceil(totalBooks / limit),
+  };
 };

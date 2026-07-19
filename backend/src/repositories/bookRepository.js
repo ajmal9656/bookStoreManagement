@@ -1,7 +1,6 @@
-import { Op,literal } from "sequelize";
+import { Op, literal } from "sequelize";
 
 import { Book, Author } from "../models/index.js";
-
 
 export const findAllBooks = async ({
   page,
@@ -24,11 +23,7 @@ export const findAllBooks = async ({
     };
   }
 
-  if (
-    minPrice !== undefined &&
-    !Number.isNaN(minPrice) &&
-    minPrice >= 0
-  ) {
+  if (minPrice !== undefined && !Number.isNaN(minPrice) && minPrice >= 0) {
     where.price = {
       [Op.gte]: minPrice,
     };
@@ -68,19 +63,11 @@ export const getBookWithAuthorById = async (id) => {
   });
 };
 
-
 export const getBookById = async (id) => {
   return await Book.findByPk(id);
 };
 
-
-
-
-export const updateBookStock = async (
-  id,
-  operation,
-  quantity
-) => {
+export const updateBookStock = async (id, operation, quantity) => {
   const stockUpdate =
     operation === "increase"
       ? literal(`stock + ${quantity}`)
@@ -93,7 +80,7 @@ export const updateBookStock = async (
     {
       where: { id },
       returning: true,
-    }
+    },
   );
 
   return books[0];

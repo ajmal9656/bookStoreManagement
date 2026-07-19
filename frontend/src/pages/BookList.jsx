@@ -35,7 +35,7 @@ const BookList = () => {
       setLoading(true);
       const params = {
         page,
-        limit:5
+        limit: 5,
       };
 
       if (debouncedSearch.trim()) {
@@ -72,7 +72,7 @@ const BookList = () => {
 
     toast.success("Book added successfully");
 
-    await loadBooks(); // refresh table
+    await loadBooks();
 
     return response;
   };
@@ -159,6 +159,7 @@ const BookList = () => {
           <tr>
             <th>Title</th>
             <th>Author</th>
+            <th>ISBN</th>
             <th>Price</th>
             <th>Stock</th>
             <th>Action</th>
@@ -178,6 +179,7 @@ const BookList = () => {
                 <td>{book.title}</td>
 
                 <td>{book.author?.name}</td>
+                <td>{book.isbn}</td>
 
                 <td>₹ {book.price}</td>
 
@@ -198,7 +200,7 @@ const BookList = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="5" style={{ textAlign: "center", padding: "20px" }}>
+              <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>
                 No books found.
               </td>
             </tr>

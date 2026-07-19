@@ -4,7 +4,6 @@ export const searchAuthors = async (req, res, next) => {
   try {
     const authors = await authorService.searchAuthors(req.query);
     console.log(authors);
-    
 
     return res.status(200).json({
       success: true,
@@ -18,8 +17,7 @@ export const searchAuthors = async (req, res, next) => {
 export const getAuthors = async (req, res, next) => {
   try {
     const result = await authorService.getAuthors(req.query);
-    console.log("contro",result);
-    
+    console.log("contro", result);
 
     return res.status(200).json({
       success: true,
@@ -57,3 +55,17 @@ export const deleteAuthor = async (req, res, next) => {
   }
 };
 
+export const getAuthorById = async (req, res, next) => {
+  try {
+    console.log("query", req.query);
+
+    const result = await authorService.getAuthorById(req.params.id, req.query);
+
+    return res.status(200).json({
+      success: true,
+      ...result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
