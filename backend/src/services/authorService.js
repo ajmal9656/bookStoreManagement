@@ -23,7 +23,6 @@ export const getAuthors = async (query) => {
     limit,
     paginate: true,
   });
-  console.log("res", result);
 
   return {
     ...result,

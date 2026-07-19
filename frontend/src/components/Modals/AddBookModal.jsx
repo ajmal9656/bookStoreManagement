@@ -23,12 +23,9 @@ const AddBookModal = ({ open, onClose, onSubmit }) => {
   const [loadingAuthors, setLoadingAuthors] = useState(false);
 
   const debouncedSearch = useDebounce(search, 500);
-  console.log("search:", search);
-  console.log("debouncedSearch:", debouncedSearch);
 
   const loadAuthors = useCallback(async () => {
     try {
-      console.log("API called with:", debouncedSearch);
       setLoadingAuthors(true);
 
       const params = {};
@@ -78,8 +75,6 @@ const AddBookModal = ({ open, onClose, onSubmit }) => {
       await onClose(false);
     } catch (error) {
       const validationErrors = error.response?.data?.error?.errors;
-      console.log(error.response?.data);
-
       if (validationErrors?.length > 0) {
         validationErrors.forEach((err) => {
           setError(err.field, {

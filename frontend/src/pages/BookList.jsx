@@ -78,10 +78,8 @@ const BookList = () => {
   };
 
   const handleUpdateStock = async (id, data) => {
-    console.log("handleUpdateStock", id, data);
 
     const response = await updateBookStock(id, data);
-    console.log("response", response);
 
     toast.success("Stock updated successfully.");
 

@@ -3,7 +3,6 @@ import * as bookService from "../services/bookService.js";
 export const getAllBooks = async (req, res, next) => {
   try {
     const result = await bookService.getAllBooks(req.query);
-    console.log("contr", result);
 
     return res.status(200).json(result);
   } catch (error) {
@@ -42,7 +41,6 @@ export const getBookById = async (req, res, next) => {
 
 export const updateBookStock = async (req, res, next) => {
   try {
-    console.log("entered here");
 
     const { id } = req.params;
 

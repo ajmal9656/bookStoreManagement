@@ -21,7 +21,5 @@ export const createBook = (data) => {
 };
 
 export const updateBookStock = async (id, data) => {
-  console.log("service", id, data);
-
   return axiosInstance.patch(`/books/${id}/stock`, data);
 };

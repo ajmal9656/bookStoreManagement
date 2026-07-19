@@ -29,7 +29,6 @@ const AuthorDetails = () => {
         page,
         limit: 5,
       });
-      console.log("response", response.data);
 
       setAuthor(response.data.author);
       setBooks(response.data.books);

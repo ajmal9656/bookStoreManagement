@@ -45,10 +45,8 @@ export const createBook = async ({ title, authorId, price, stock }) => {
       authorId,
     },
   );
-  console.log("checks", titleExists);
 
   if (titleExists) {
-    console.log("inside");
 
     throw new ApiError(
       409,
@@ -85,7 +83,6 @@ export const getBookById = async (id) => {
 
 export const updateBookStock = async (id, { operation, quantity }) => {
   const book = await bookRepository.getBookById(id);
-  console.log("book quant", book, quantity);
 
   if (!book) {
     throw new ApiError(404, "Book not found.");
