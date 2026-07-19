@@ -9,7 +9,15 @@ export const searchAuthors = async ({ search }) => {
   return authors.map((author) => author.toJSON());
 };
 
-export const getAuthors = async ({ search, page, limit = 5 }) => {
+export const getAuthors = async (query) => {
+  const page = Math.max(1, Number(query.page) || 1);
+
+  const limit = Math.min(
+    50,
+    Math.max(1, Number(query.limit) || 5)
+  );
+
+  const search = query.search?.trim();
   const result = await authorRepository.getAuthors({
     search,
     page,

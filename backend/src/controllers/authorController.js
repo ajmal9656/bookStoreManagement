@@ -18,6 +18,8 @@ export const searchAuthors = async (req, res, next) => {
 export const getAuthors = async (req, res, next) => {
   try {
     const result = await authorService.getAuthors(req.query);
+    console.log("contro",result);
+    
 
     return res.status(200).json({
       success: true,

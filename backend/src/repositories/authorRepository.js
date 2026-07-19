@@ -42,6 +42,6 @@ export const getAuthors = async ({
     authors: rows,
     totalAuthors: count,
     totalPages: Math.ceil(count / limit),
-    currentPage: page,
+    currentPage: Number(page),
   };
 };
