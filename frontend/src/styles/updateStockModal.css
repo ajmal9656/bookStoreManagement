@@ -2,7 +2,6 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.3);
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,8 +14,12 @@
   border-radius: 5px;
 }
 
+
 .modal h2 {
   margin-bottom: 15px;
+}
+.modal-heading {
+  color: black;
 }
 
 .modal input,
@@ -26,6 +29,7 @@
   margin-top: 10px;
   margin-bottom: 10px;
   box-sizing: border-box;
+  color: rgb(183, 179, 179);
 }
 
 .modal p {
@@ -40,10 +44,9 @@
   gap: 10px;
 }
 
-/* ---------- Update Stock Specific ---------- */
 
 .readonly-input {
-  background: #f5f5f5;
+  background: #4b4b4b;
   cursor: not-allowed;
 }
 
@@ -63,4 +66,5 @@
 .stock-options input[type="radio"] {
   width: auto;
   margin: 0;
+  
 }

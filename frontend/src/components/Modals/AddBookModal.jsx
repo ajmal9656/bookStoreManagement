@@ -15,7 +15,7 @@ const AddBookModal = ({ open, onClose, onSubmit }) => {
     reset,
     clearErrors,
     setError,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm();
 
   const [authors, setAuthors] = useState([]);
@@ -57,13 +57,13 @@ const AddBookModal = ({ open, onClose, onSubmit }) => {
 
   if (!open) return null;
 
-  const handleClose = () => {
+  const handleClose = async (refresh = false) => {
     reset();
     clearErrors();
     setSearch("");
     setAuthors([]);
 
-    onClose();
+    await onClose(refresh);
   };
 
   const submitHandler = async (data) => {
@@ -75,7 +75,7 @@ const AddBookModal = ({ open, onClose, onSubmit }) => {
       setSearch("");
       setAuthors([]);
 
-      onClose();
+      await onClose(false);
     } catch (error) {
       const validationErrors = error.response?.data?.error?.errors;
       console.log(error.response?.data);
@@ -100,7 +100,7 @@ const AddBookModal = ({ open, onClose, onSubmit }) => {
   return (
     <div className="modal-backdrop">
       <div className="modal">
-        <h2>Add Book</h2>
+        <h2 className="modal-heading">Add Book</h2>
 
         <form onSubmit={handleSubmit(submitHandler)}>
           <input
@@ -159,10 +159,18 @@ const AddBookModal = ({ open, onClose, onSubmit }) => {
                   control: (base) => ({
                     ...base,
                     minHeight: 38,
-                    boxShadow: "none",
-                    borderColor: "#a0a0a0",
                     backgroundColor: "#414141",
-                    color: "#a0a0a0",
+                    borderColor: "#a0a0a0",
+                    fontSize: "14px",
+                  }),
+                  singleValue: (base) => ({
+                    ...base,
+                    color: "#fff",
+                    fontSize: "14px",
+                  }),
+                  placeholder: (base) => ({
+                    ...base,
+                    fontSize: "14px",
                   }),
                 }}
               />
@@ -224,12 +232,12 @@ const AddBookModal = ({ open, onClose, onSubmit }) => {
           {errors.stock && <p className="error">{errors.stock.message}</p>}
 
           <div className="modal-buttons">
-            <Button variant="secondary" onClick={handleClose}>
+            <Button variant="secondary" onClick={() => handleClose(true)}>
               Cancel
             </Button>
 
-            <Button type="submit" disabled={loadingAuthors}>
-              Save
+            <Button type="submit" disabled={loadingAuthors || isSubmitting}>
+              {isSubmitting ? "Saving..." : "Save"}
             </Button>
           </div>
         </form>

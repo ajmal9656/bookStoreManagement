@@ -56,6 +56,18 @@ export const create = async (data) => {
   return Book.create(data);
 };
 
+export const getBookWithAuthorById = async (id) => {
+  return await Book.findByPk(id, {
+    include: [
+      {
+        model: Author,
+        as: "author",
+        attributes: ["id", "name"],
+      },
+    ],
+  });
+};
+
 
 export const getBookById = async (id) => {
   return await Book.findByPk(id);

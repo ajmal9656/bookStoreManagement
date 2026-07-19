@@ -6,7 +6,9 @@ export const getBooks = (params) => {
   });
 };
 
-
+export const getBookById = (id) => {
+  return axiosInstance.get(`/books/${id}`);
+};
 
 export const createBook = (data) => {
   return axiosInstance.post("/books", data);

@@ -1,12 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 import Button from "../Button";
 
 import "../../styles/updateStockModal.css";
+import Loader from "../Loader";
+import { getBookById } from "../../services/bookService";
 
-const UpdateStockModal = ({ book, onClose, onSubmit, onRefresh, }) => {
+const UpdateStockModal = ({ open, bookId, onClose, onSubmit }) => {
   const {
     register,
     handleSubmit,
@@ -14,7 +16,7 @@ const UpdateStockModal = ({ book, onClose, onSubmit, onRefresh, }) => {
     reset,
     clearErrors,
     setError,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       operation: "increase",
@@ -22,20 +24,55 @@ const UpdateStockModal = ({ book, onClose, onSubmit, onRefresh, }) => {
     },
   });
 
+  const [book, setBook] = useState(null);
+  const [loadingBook, setLoadingBook] = useState(false);
+
   const operation = watch("operation");
 
   useEffect(() => {
-    if (!book) return;
+    if (!open || !bookId) return;
 
-    reset({
-      operation: "increase",
-      quantity: "",
-    });
-  }, [book, reset]);
+    const loadBook = async () => {
+      try {
+        setLoadingBook(true);
+
+        const response = await getBookById(bookId);
+
+        setBook(response.data.book);
+
+        reset({
+          operation: "increase",
+          quantity: "",
+        });
+
+        clearErrors();
+      } catch (error) {
+        toast.error(
+          error.response?.data?.error?.message || "Failed to load book.",
+        );
+
+        onClose();
+      } finally {
+        setLoadingBook(false);
+      }
+    };
+
+    loadBook();
+  }, [open, bookId, reset, clearErrors, onClose]);
+
+  if (loadingBook) {
+    return (
+      <div className="modal-backdrop">
+        <div className="modal">
+          <Loader />
+        </div>
+      </div>
+    );
+  }
 
   if (!book) return null;
 
-  const handleClose = () => {
+  const handleClose = async (refresh = false) => {
     reset({
       operation: "increase",
       quantity: "",
@@ -43,157 +80,126 @@ const UpdateStockModal = ({ book, onClose, onSubmit, onRefresh, }) => {
 
     clearErrors();
 
-    onClose();
+    await onClose(refresh);
   };
 
   const submitHandler = async (data) => {
     console.log("submitHandler", data);
-    
-  if (
-    data.operation === "decrease" &&
-    data.quantity > book.stock
-  ) {
-    setError("quantity", {
-      type: "manual",
-      message: "Quantity cannot exceed current stock.",
-    });
 
-    return;
-  }
+    try {
+      console.log("about to api");
 
-  try {
-    console.log("about to api");
-    
-    await onSubmit(book.id, data);
+      await onSubmit(book.id, data);
 
-    handleClose();
-  } catch (error) {
-    const validationErrors =
-      error.response?.data?.error?.errors;
+      await handleClose(false);
+    } catch (error) {
+      const validationErrors = error.response?.data?.error?.errors;
 
-    if (validationErrors?.length > 0) {
-      validationErrors.forEach((err) => {
-        setError(err.field, {
-          type: "server",
-          message: err.message,
+      if (validationErrors?.length > 0) {
+        validationErrors.forEach((err) => {
+          setError(err.field, {
+            type: "server",
+            message: err.message,
+          });
         });
-      });
 
-      await onRefresh();
+        return;
+      }
 
-      return;
+      toast.error(
+        error.response?.data?.error?.message || "Something went wrong.",
+      );
     }
-
-    toast.error(
-      error.response?.data?.error?.message ||
-        "Something went wrong."
-    );
-  }
-};
+  };
 
   return (
-  <div className="modal-backdrop">
-    <div className="modal">
-      <h2>Update Stock</h2>
+    <div className="modal-backdrop">
+      <div className="modal">
+        <h2 className="modal-heading">Update Stock</h2>
 
-      <form onSubmit={handleSubmit(submitHandler)}>
-        <input
-          type="text"
-          value={book.title}
-          className="readonly-input"
-          disabled
-        />
+        <form onSubmit={handleSubmit(submitHandler)}>
+          <input
+            type="text"
+            value={book.title}
+            className="readonly-input"
+            disabled
+          />
 
-        <input
-          type="text"
-          value={book.author?.name}
-          className="readonly-input"
-          disabled
-        />
+          <input
+            type="text"
+            value={book.author?.name}
+            className="readonly-input"
+            disabled
+          />
 
-        <input
-          type="text"
-          value={book.stock}
-          className="readonly-input"
-          disabled
-        />
+          <input
+            type="text"
+            value={book.stock}
+            className="readonly-input"
+            disabled
+          />
 
-        <div className="stock-options">
-          <label>
-            <input
-              type="radio"
-              value="increase"
-              {...register("operation")}
-            />
-            Increase
-          </label>
+          <div className="stock-options">
+            <label>
+              <input type="radio" value="increase" {...register("operation")} />
+              Increase
+            </label>
 
-          <label>
-            <input
-              type="radio"
-              value="decrease"
-              {...register("operation")}
-            />
-            Decrease
-          </label>
-        </div>
+            <label>
+              <input type="radio" value="decrease" {...register("operation")} />
+              Decrease
+            </label>
+          </div>
 
-        <input
-          type="text"
-          inputMode="numeric"
-          placeholder="Quantity"
-          {...register("quantity", {
-            required: "Quantity is required",
-            pattern: {
-              value: /^\d+$/,
-              message: "Quantity must be a valid number",
-            },
-            validate: (value) => {
-              if (Number(value) <= 0) {
-                return "Quantity must be greater than 0";
-              }
+          <input
+            type="text"
+            inputMode="numeric"
+            placeholder="Quantity"
+            {...register("quantity", {
+              required: "Quantity is required",
+              pattern: {
+                value: /^\d+$/,
+                message: "Quantity must be a valid number",
+              },
+              validate: (value) => {
+                if (Number(value) <= 0) {
+                  return "Quantity must be greater than 0";
+                }
 
-              if (
-                operation === "decrease" &&
-                Number(value) > book.stock
-              ) {
-                return "Quantity cannot exceed current stock";
-              }
+                return true;
+              },
+              setValueAs: (value) => Number(value),
+              onChange: (e) => {
+                const value = e.target.value;
 
-              return true;
-            },
-            setValueAs: (value) => Number(value),
-            onChange: (e) => {
-              const value = e.target.value;
+                if (!/^\d*$/.test(value)) {
+                  e.target.value = value.replace(/\D/g, "");
+                }
+              },
+            })}
+          />
 
-              if (!/^\d*$/.test(value)) {
-                e.target.value = value.replace(/\D/g, "");
-              }
-            },
-          })}
-        />
+          {errors.quantity && (
+            <p className="error">{errors.quantity.message}</p>
+          )}
 
-        {errors.quantity && (
-          <p className="error">{errors.quantity.message}</p>
-        )}
+          <div className="modal-buttons">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => handleClose(true)}
+            >
+              Cancel
+            </Button>
 
-        <div className="modal-buttons">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleClose}
-          >
-            Cancel
-          </Button>
-
-          <Button type="submit">
-            Update Stock
-          </Button>
-        </div>
-      </form>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Updating..." : "Update Stock"}
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default UpdateStockModal;

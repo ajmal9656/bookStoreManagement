@@ -26,9 +26,25 @@ export const createBook = async (req, res, next) => {
   }
 };
 
+
+export const getBookById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const book = await bookService.getBookById(id);
+
+    res.status(200).json({
+      success: true,
+      book,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const updateBookStock = async (req, res, next) => {
   try {
-    console.log("entered");
+    console.log("entered here");
     
     const { id } = req.params;
 

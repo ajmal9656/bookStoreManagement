@@ -100,12 +100,24 @@ if (titleExists) {
 };
 
 
+export const getBookById = async (id) => {
+  const book = await bookRepository.getBookWithAuthorById(id);
+
+  if (!book) {
+    throw new ApiError(404, "Book not found.");
+  }
+
+  return book;
+};
+
 
 export const updateBookStock = async (
   id,
   { operation, quantity }
 ) => {
   const book = await bookRepository.getBookById(id);
+  console.log("book quant",book,quantity);
+  
 
   if (!book) {
     throw new ApiError(404, "Book not found.");

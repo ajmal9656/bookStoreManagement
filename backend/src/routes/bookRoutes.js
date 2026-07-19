@@ -12,7 +12,11 @@ router.post(
   validate(createBookSchema, "body"),
   bookController.createBook
 );
-
+router.get(
+  "/:id",
+  validate(idParamSchema, "params"),
+  bookController.getBookById
+);
 router.patch(
   "/:id/stock",
   validate(idParamSchema, "params"),

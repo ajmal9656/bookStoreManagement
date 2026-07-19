@@ -6,7 +6,7 @@ import Loader from "../components/Loader";
 import AddBookModal from "../components/modals/AddBookModal";
 import UpdateStockModal from "../components/modals/UpdateStockModal";
 
-import { createBook, getBooks,updateBookStock } from "../services/bookService";
+import { createBook, getBooks, updateBookStock } from "../services/bookService";
 
 import "../styles/bookList.css";
 import useDebounce from "../hook/useDebounce";
@@ -25,10 +25,10 @@ const BookList = () => {
   const [openBookModal, setOpenBookModal] = useState(false);
 
   const [openStockModal, setOpenStockModal] = useState(false);
-  const [selectedBook, setSelectedBook] = useState(null);
+  const [selectedBookId, setSelectedBookId] = useState(null);
 
-  const debouncedSearch = useDebounce(search, 3000);
-  const debouncedMinPrice = useDebounce(minPrice, 3000);
+  const debouncedSearch = useDebounce(search, 500);
+  const debouncedMinPrice = useDebounce(minPrice, 500);
 
   const loadBooks = async () => {
     try {
@@ -78,17 +78,33 @@ const BookList = () => {
 
   const handleUpdateStock = async (id, data) => {
     console.log("handleUpdateStock", id, data);
-    
-  const response = await updateBookStock(id, data);
-  console.log("response",response);
-  
 
-  toast.success("Stock updated successfully.");
+    const response = await updateBookStock(id, data);
+    console.log("response", response);
 
-  await loadBooks();
+    toast.success("Stock updated successfully.");
 
-  return response;
-};
+    await loadBooks();
+
+    return response;
+  };
+
+  const handleCloseBookModal = async (refresh = false) => {
+    if (refresh) {
+      await loadBooks();
+    }
+
+    setOpenBookModal(false);
+  };
+
+  const handleCloseStockModal = async (refresh) => {
+    if (refresh) {
+      await loadBooks();
+    }
+
+    setOpenStockModal(false);
+    setSelectedBookId(null);
+  };
 
   return (
     <div className="book-page">
@@ -170,7 +186,7 @@ const BookList = () => {
                   <Button
                     variant="secondary"
                     onClick={() => {
-                      setSelectedBook(book);
+                      setSelectedBookId(book.id);
                       setOpenStockModal(true);
                     }}
                   >
@@ -213,22 +229,19 @@ const BookList = () => {
       {openBookModal && (
         <AddBookModal
           open={openBookModal}
-          onClose={() => setOpenBookModal(false)}
+          onClose={handleCloseBookModal}
           onSubmit={handleCreateBook}
         />
       )}
 
-      {openStockModal && selectedBook && (
-  <UpdateStockModal
-    book={selectedBook}
-    onClose={() => {
-      setOpenStockModal(false);
-      setSelectedBook(null);
-    }}
-    onSubmit={handleUpdateStock}
-    onRefresh={loadBooks}
-  />
-)}
+      {openStockModal && (
+        <UpdateStockModal
+          open={openStockModal}
+          bookId={selectedBookId}
+          onClose={handleCloseStockModal}
+          onSubmit={handleUpdateStock}
+        />
+      )}
     </div>
   );
 };

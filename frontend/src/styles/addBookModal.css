@@ -18,6 +18,9 @@
 .modal h2 {
   margin-bottom: 15px;
 }
+.modal-heading {
+  color: black;
+}
 
 .modal input,
 .modal select {
@@ -42,28 +45,4 @@
 .readonly-input {
   cursor: not-allowed;
   opacity: 0.8;
-}
-
-.stock-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin: 20px 0;
-}
-
-.stock-input {
-  width: 70px;
-  text-align: center;
-  font-size: 20px;
-  font-weight: 600;
-  background-color: #414141;
-  color: #fff;
-  border: 1px solid #888;
-  border-radius: 6px;
-  cursor: default;
-}
-
-.stock-input:focus {
-  outline: none;
 }
