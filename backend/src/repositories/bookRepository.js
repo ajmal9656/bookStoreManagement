@@ -50,3 +50,7 @@ export const findAllBooks = async ({
     order: [["createdAt", "DESC"]],
   });
 };
+
+export const create = async (data) => {
+  return Book.create(data);
+};

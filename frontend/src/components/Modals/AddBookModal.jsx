@@ -1,26 +1,100 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import Button from "../Button";
 import "../../styles/Modal.css";
+import useDebounce from "../../hook/useDebounce";
+import { useEffect, useState, useCallback } from "react";
+import toast from "react-hot-toast";
+import { getAuthors } from "../../services/authorService";
+import Select from "react-select";
 
-const AddBookModal = ({
-  isOpen,
-  onClose,
-  onSubmit,
-  authors = [],
-}) => {
+const AddBookModal = ({ open, onClose, onSubmit }) => {
   const {
     register,
+    control,
     handleSubmit,
     reset,
+    clearErrors,
+    setError,
     formState: { errors },
   } = useForm();
 
-  if (!isOpen) return null;
+  const [authors, setAuthors] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loadingAuthors, setLoadingAuthors] = useState(false);
 
-  const submitHandler = (data) => {
-    onSubmit(data);
+  const debouncedSearch = useDebounce(search, 500);
+  console.log("search:", search);
+  console.log("debouncedSearch:", debouncedSearch);
+
+  const loadAuthors = useCallback(async () => {
+    try {
+      console.log("API called with:", debouncedSearch);
+      setLoadingAuthors(true);
+
+      const params = {};
+
+      if (debouncedSearch.trim()) {
+        params.search = debouncedSearch;
+      }
+
+      const response = await getAuthors(params);
+
+      setAuthors(response.data.authors);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.error?.message || "Failed to load authors",
+      );
+    } finally {
+      setLoadingAuthors(false);
+    }
+  }, [debouncedSearch]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    loadAuthors();
+  }, [open, debouncedSearch]);
+
+  if (!open) return null;
+
+  const handleClose = () => {
     reset();
+    clearErrors();
+    setSearch("");
+    setAuthors([]);
+
     onClose();
+  };
+
+  const submitHandler = async (data) => {
+    try {
+      await onSubmit(data);
+
+      reset();
+      clearErrors();
+      setSearch("");
+      setAuthors([]);
+
+      onClose();
+    } catch (error) {
+      const validationErrors = error.response?.data?.error?.errors;
+      console.log(error.response?.data);
+
+      if (validationErrors?.length > 0) {
+        validationErrors.forEach((err) => {
+          setError(err.field, {
+            type: "server",
+            message: err.message,
+          });
+        });
+
+        return;
+      }
+
+      toast.error(
+        error.response?.data?.error?.message || "Something went wrong",
+      );
+    }
   };
 
   return (
@@ -29,65 +103,135 @@ const AddBookModal = ({
         <h2>Add Book</h2>
 
         <form onSubmit={handleSubmit(submitHandler)}>
-
           <input
             type="text"
             placeholder="Book Title"
             {...register("title", {
               required: "Title is required",
+              minLength: {
+                value: 3,
+                message: "Minimum 3 characters",
+              },
+              maxLength: {
+                value: 100,
+                message: "Maximum 100 characters",
+              },
             })}
           />
-          <p>{errors.title?.message}</p>
-
-          <select
-            {...register("authorId", {
+          {errors.title && <p className="error">{errors.title.message}</p>}
+          <Controller
+            name="authorId"
+            control={control}
+            rules={{
               required: "Author is required",
-            })}
-          >
-            <option value="">Select Author</option>
+            }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                isLoading={loadingAuthors}
+                isClearable
+                filterOption={() => true}
+                placeholder="Search and Select Author"
+                options={authors.map((author) => ({
+                  value: author.id,
+                  label: author.name,
+                }))}
+                value={
+                  authors
+                    .map((author) => ({
+                      value: author.id,
+                      label: author.name,
+                    }))
+                    .find((option) => option.value === field.value) || null
+                }
+                onChange={(selected) => {
+                  field.onChange(selected?.value || "");
+                }}
+                onInputChange={(inputValue, { action }) => {
+                  if (action === "input-change") {
+                    setSearch(inputValue);
+                  }
+                }}
+                noOptionsMessage={() =>
+                  loadingAuthors ? "Loading..." : "No authors found"
+                }
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    minHeight: 38,
+                    boxShadow: "none",
+                    borderColor: "#a0a0a0",
+                    backgroundColor: "#414141",
+                    color: "#a0a0a0",
+                  }),
+                }}
+              />
+            )}
+          />
 
-            {authors.map((author) => (
-              <option
-                key={author.id}
-                value={author.id}
-              >
-                {author.name}
-              </option>
-            ))}
-          </select>
-          <p>{errors.authorId?.message}</p>
+          {errors.authorId && (
+            <p className="error">{errors.authorId.message}</p>
+          )}
 
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
             placeholder="Price"
             {...register("price", {
               required: "Price is required",
+              pattern: {
+                value: /^\d+$/,
+                message: "Price must be a valid number",
+              },
+              validate: (value) =>
+                Number(value) >= 1 || "Price must be positive",
+              setValueAs: (value) => Number(value),
+              onChange: (e) => {
+                const value = e.target.value;
+
+                if (!/^\d*$/.test(value)) {
+                  e.target.value = value.replace(/\D/g, "");
+                }
+              },
             })}
           />
-          <p>{errors.price?.message}</p>
+
+          {errors.price && <p className="error">{errors.price.message}</p>}
 
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
             placeholder="Stock"
             {...register("stock", {
               required: "Stock is required",
+              pattern: {
+                value: /^\d+$/,
+                message: "Stock must be a valid number",
+              },
+              validate: (value) =>
+                Number(value) >= 0 || "Stock cannot be negative",
+              setValueAs: (value) => Number(value),
+              onChange: (e) => {
+                const value = e.target.value;
+
+                if (!/^\d*$/.test(value)) {
+                  e.target.value = value.replace(/\D/g, "");
+                }
+              },
             })}
           />
-          <p>{errors.stock?.message}</p>
+
+          {errors.stock && <p className="error">{errors.stock.message}</p>}
 
           <div className="modal-buttons">
-            <Button
-              variant="secondary"
-              onClick={onClose}
-            >
+            <Button variant="secondary" onClick={handleClose}>
               Cancel
             </Button>
 
-            <Button type="submit">
+            <Button type="submit" disabled={loadingAuthors}>
               Save
             </Button>
           </div>
-
         </form>
       </div>
     </div>

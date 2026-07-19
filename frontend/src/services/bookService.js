@@ -1,23 +1,15 @@
 import axiosInstance from "../api/axios";
 
-export const getBooks = ({
-  page = 1,
-  search = "",
-  minPrice = "",
-  inStock = false,
-}) => {
+export const getBooks = (params) => {
   return axiosInstance.get("/books", {
-    params: {
-      page,
-      search,
-      minPrice,
-      inStock,
-    },
+    params,
   });
 };
 
-export const createBook = (bookData) => {
-  return axiosInstance.post("/books", bookData);
+
+
+export const createBook = (data) => {
+  return axiosInstance.post("/books", data);
 };
 
 export const updateBookStock = (id, stockData) => {
