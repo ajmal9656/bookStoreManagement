@@ -4,7 +4,7 @@ import "../../styles/addBookModal.css";
 import useDebounce from "../../hook/useDebounce";
 import { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
-import { getAuthors } from "../../services/authorService";
+import { getAuthors } from "../../services/bookService";
 import Select from "react-select";
 
 const AddBookModal = ({ open, onClose, onSubmit }) => {
@@ -23,12 +23,9 @@ const AddBookModal = ({ open, onClose, onSubmit }) => {
   const [loadingAuthors, setLoadingAuthors] = useState(false);
 
   const debouncedSearch = useDebounce(search, 500);
-  console.log("search:", search);
-  console.log("debouncedSearch:", debouncedSearch);
 
   const loadAuthors = useCallback(async () => {
     try {
-      console.log("API called with:", debouncedSearch);
       setLoadingAuthors(true);
 
       const params = {};
@@ -78,8 +75,6 @@ const AddBookModal = ({ open, onClose, onSubmit }) => {
       await onClose(false);
     } catch (error) {
       const validationErrors = error.response?.data?.error?.errors;
-      console.log(error.response?.data);
-
       if (validationErrors?.length > 0) {
         validationErrors.forEach((err) => {
           setError(err.field, {
@@ -183,22 +178,22 @@ const AddBookModal = ({ open, onClose, onSubmit }) => {
 
           <input
             type="text"
-            inputMode="numeric"
+            inputMode="decimal"
             placeholder="Price"
             {...register("price", {
               required: "Price is required",
               pattern: {
-                value: /^\d+$/,
-                message: "Price must be a valid number",
+                value: /^\d+(\.\d{1,2})?$/,
+                message: "Enter a valid price",
               },
               validate: (value) =>
-                Number(value) >= 1 || "Price must be positive",
-              setValueAs: (value) => Number(value),
+                parseFloat(value) > 0 || "Price must be positive",
+              setValueAs: (value) => parseFloat(value),
               onChange: (e) => {
                 const value = e.target.value;
 
-                if (!/^\d*$/.test(value)) {
-                  e.target.value = value.replace(/\D/g, "");
+                if (!/^\d*\.?\d{0,2}$/.test(value)) {
+                  e.target.value = value.slice(0, -1);
                 }
               },
             })}

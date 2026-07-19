@@ -15,13 +15,7 @@ const validate = (schema, property = "body") => {
           message: detail.message,
         }));
 
-        return next(
-          new ApiError(
-            400,
-            "Validation failed",
-            errors
-          )
-        );
+        return next(new ApiError(400, "Validation failed", errors));
       }
 
       const message =

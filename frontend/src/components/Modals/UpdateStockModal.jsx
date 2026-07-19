@@ -84,10 +84,7 @@ const UpdateStockModal = ({ open, bookId, onClose, onSubmit }) => {
   };
 
   const submitHandler = async (data) => {
-    console.log("submitHandler", data);
-
     try {
-      console.log("about to api");
 
       await onSubmit(book.id, data);
 

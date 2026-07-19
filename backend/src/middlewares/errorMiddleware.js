@@ -3,7 +3,6 @@ import { ValidationError } from "sequelize";
 import ApiError from "../errors/ApiError.js";
 
 const errorHandler = (err, req, res, next) => {
-  // Custom application errors
   if (err instanceof ApiError) {
     return res.status(err.statusCode).json({
       error: {
@@ -14,7 +13,6 @@ const errorHandler = (err, req, res, next) => {
     });
   }
 
-  // Sequelize model validation errors
   if (err instanceof ValidationError) {
     return res.status(400).json({
       error: {
@@ -28,7 +26,6 @@ const errorHandler = (err, req, res, next) => {
     });
   }
 
-  // Unexpected errors
   console.error(err);
 
   return res.status(500).json({

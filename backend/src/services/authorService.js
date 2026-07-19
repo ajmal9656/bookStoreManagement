@@ -1,4 +1,6 @@
+import ApiError from "../errors/ApiError.js";
 import * as authorRepository from "../repositories/authorRepository.js";
+import { checkFieldValueExist } from "../utils/checkFieldValueExist.js";
 
 export const searchAuthors = async ({ search }) => {
   const authors = await authorRepository.getAuthors({
@@ -9,7 +11,12 @@ export const searchAuthors = async ({ search }) => {
   return authors.map((author) => author.toJSON());
 };
 
-export const getAuthors = async ({ search, page, limit }) => {
+export const getAuthors = async (query) => {
+  const page = Math.max(1, Number(query.page) || 1);
+
+  const limit = Math.min(50, Math.max(1, Number(query.limit) || 5));
+
+  const search = query.search?.trim();
   const result = await authorRepository.getAuthors({
     search,
     page,
@@ -20,5 +27,68 @@ export const getAuthors = async ({ search, page, limit }) => {
   return {
     ...result,
     authors: result.authors.map((author) => author.toJSON()),
+  };
+};
+
+export const createAuthor = async ({ name, bio }) => {
+  const trimmedName = name.trim();
+
+  const authorExists = await checkFieldValueExist(
+    "Author",
+    "name",
+    trimmedName,
+  );
+
+  if (authorExists) {
+    throw new ApiError(409, "An author with this name already exists.");
+  }
+
+  const author = await authorRepository.create({
+    name: trimmedName,
+    bio: bio.trim(),
+  });
+
+  return author.toJSON();
+};
+
+export const deleteAuthor = async (id) => {
+  const author = await authorRepository.findById(id);
+
+  if (!author) {
+    throw new ApiError(404, "Author not found.");
+  }
+
+  const deleted = await authorRepository.deleteAuthor(id);
+
+  if (!deleted) {
+    throw new ApiError(
+      409,
+      "Cannot delete author because the author has books.",
+    );
+  }
+};
+
+export const getAuthorById = async (id, query) => {
+  const page = Math.max(1, Number(query.page) || 1);
+
+  const limit = Math.min(50, Math.max(1, Number(query.limit) || 5));
+
+  const author = await authorRepository.findById(id);
+
+  if (!author) {
+    throw new ApiError(404, "Author not found.");
+  }
+
+  const { books, totalBooks } = await authorRepository.getBooksByAuthor(
+    id,
+    page,
+    limit,
+  );
+
+  return {
+    author: author.toJSON(),
+    books,
+    page: Number(page),
+    totalPages: Math.ceil(totalBooks / limit),
   };
 };
