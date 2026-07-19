@@ -30,3 +30,17 @@ export const getAuthors = async (req, res, next) => {
   }
 };
 
+export const createAuthor = async (req, res, next) => {
+  try {
+    const author = await authorService.createAuthor(req.body);
+
+    return res.status(201).json({
+      success: true,
+      message: "Author created successfully.",
+      author,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

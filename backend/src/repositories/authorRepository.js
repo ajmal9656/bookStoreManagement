@@ -45,3 +45,7 @@ export const getAuthors = async ({
     currentPage: Number(page),
   };
 };
+
+export const create = async (data) => {
+  return Author.create(data);
+};

@@ -41,3 +41,32 @@ export const listAuthorsSchema = Joi.object({
         "number.max": "Limit cannot exceed 50.",
       }),
 });
+
+
+export const createAuthorSchema = Joi.object({
+  name: Joi.string()
+    .trim()
+    .min(3)
+    .max(100)
+    .required()
+    .messages({
+      "string.base": "Name must be a string.",
+      "string.empty": "Name is required.",
+      "string.min": "Name must be at least 3 characters.",
+      "string.max": "Name cannot exceed 100 characters.",
+      "any.required": "Name is required.",
+    }),
+
+  bio: Joi.string()
+    .trim()
+    .min(10)
+    .max(500)
+    .required()
+    .messages({
+      "string.base": "Bio must be a string.",
+      "string.empty": "Bio is required.",
+      "string.min": "Bio must be at least 10 characters.",
+      "string.max": "Bio cannot exceed 500 characters.",
+      "any.required": "Bio is required.",
+    }),
+});
