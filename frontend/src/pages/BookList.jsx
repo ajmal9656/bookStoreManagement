@@ -4,9 +4,9 @@ import toast from "react-hot-toast";
 import Button from "../components/Button";
 import Loader from "../components/Loader";
 import AddBookModal from "../components/modals/AddBookModal";
-// import UpdateStockModal from "../components/modals/UpdateStockModal";
+import UpdateStockModal from "../components/modals/UpdateStockModal";
 
-import { createBook, getBooks } from "../services/bookService";
+import { createBook, getBooks,updateBookStock } from "../services/bookService";
 
 import "../styles/bookList.css";
 import useDebounce from "../hook/useDebounce";
@@ -77,16 +77,18 @@ const BookList = () => {
   };
 
   const handleUpdateStock = async (id, data) => {
-    try {
-      // await updateBookStock(id, data);
+    console.log("handleUpdateStock", id, data);
+    
+  const response = await updateBookStock(id, data);
+  console.log("response",response);
+  
 
-      toast.success("Stock updated");
+  toast.success("Stock updated successfully.");
 
-      loadBooks();
-    } catch (error) {
-      toast.error(error.response?.data?.error?.message);
-    }
-  };
+  await loadBooks();
+
+  return response;
+};
 
   return (
     <div className="book-page">
@@ -216,16 +218,17 @@ const BookList = () => {
         />
       )}
 
-      {/* {selectedBook && (
-
-        <UpdateStockModal
-          open={openStockModal}
-          onClose={() => setOpenStockModal(false)}
-          book={selectedBook}
-          onSubmit={handleUpdateStock}
-        />
-
-      )} */}
+      {openStockModal && selectedBook && (
+  <UpdateStockModal
+    book={selectedBook}
+    onClose={() => {
+      setOpenStockModal(false);
+      setSelectedBook(null);
+    }}
+    onSubmit={handleUpdateStock}
+    onRefresh={loadBooks}
+  />
+)}
     </div>
   );
 };

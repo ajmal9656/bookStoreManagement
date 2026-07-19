@@ -91,3 +91,38 @@ export const createBookSchema = Joi.object({
       "any.required": "Stock is required.",
     }),
 });
+
+export const updateBookStockSchema = Joi.object({
+  operation: Joi.string()
+    .valid("increase", "decrease")
+    .required()
+    .messages({
+      "any.required": "Operation is required.",
+      "any.only": "Operation must be either increase or decrease.",
+    }),
+
+  quantity: Joi.number()
+    .integer()
+    .min(1)
+    .required()
+    .messages({
+      "number.base": "Quantity must be a valid number.",
+      "number.integer": "Quantity must be an integer.",
+      "number.min": "Quantity must be greater than 0.",
+      "any.required": "Quantity is required.",
+    }),
+});
+
+
+export const idParamSchema = Joi.object({
+  id: Joi.number()
+    .integer()
+    .positive()
+    .required()
+    .messages({
+      "any.required": "Id is required.",
+      "number.base": "Id must be a valid number.",
+      "number.integer": "Id must be an integer.",
+      "number.positive": "Id must be greater than 0.",
+    }),
+});

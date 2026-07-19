@@ -98,3 +98,38 @@ if (titleExists) {
 
   return book.toJSON();
 };
+
+
+
+export const updateBookStock = async (
+  id,
+  { operation, quantity }
+) => {
+  const book = await bookRepository.getBookById(id);
+
+  if (!book) {
+    throw new ApiError(404, "Book not found.");
+  }
+
+  if (
+    operation === "decrease" &&
+    quantity > book.stock
+  ) {
+    throw new ApiError(
+      400,
+      "Validation failed.",
+      [
+        {
+          field: "quantity",
+          message: "Quantity cannot exceed current stock.",
+        },
+      ]
+    );
+  }
+
+  return await bookRepository.updateBookStock(
+    id,
+    operation,
+    quantity
+  );
+};

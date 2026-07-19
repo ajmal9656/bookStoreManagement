@@ -1,6 +1,6 @@
 import { useForm, Controller } from "react-hook-form";
 import Button from "../Button";
-import "../../styles/Modal.css";
+import "../../styles/addBookModal.css";
 import useDebounce from "../../hook/useDebounce";
 import { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";

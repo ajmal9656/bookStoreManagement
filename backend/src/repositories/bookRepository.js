@@ -1,6 +1,7 @@
-import { Op } from "sequelize";
+import { Op,literal } from "sequelize";
 
 import { Book, Author } from "../models/index.js";
+
 
 export const findAllBooks = async ({
   page,
@@ -53,4 +54,35 @@ export const findAllBooks = async ({
 
 export const create = async (data) => {
   return Book.create(data);
+};
+
+
+export const getBookById = async (id) => {
+  return await Book.findByPk(id);
+};
+
+
+
+
+export const updateBookStock = async (
+  id,
+  operation,
+  quantity
+) => {
+  const stockUpdate =
+    operation === "increase"
+      ? literal(`stock + ${quantity}`)
+      : literal(`stock - ${quantity}`);
+
+  const [, books] = await Book.update(
+    {
+      stock: stockUpdate,
+    },
+    {
+      where: { id },
+      returning: true,
+    }
+  );
+
+  return books[0];
 };
