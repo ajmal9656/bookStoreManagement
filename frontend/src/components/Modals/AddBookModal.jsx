@@ -158,13 +158,22 @@ const AddBookModal = ({ open, onClose, onSubmit }) => {
                     borderColor: "#a0a0a0",
                     fontSize: "14px",
                   }),
+
                   singleValue: (base) => ({
                     ...base,
                     color: "#fff",
                     fontSize: "14px",
                   }),
+
                   placeholder: (base) => ({
                     ...base,
+                    color: "#bfbfbf",
+                    fontSize: "14px",
+                  }),
+
+                  input: (base) => ({
+                    ...base,
+                    color: "#d3d3d3",
                     fontSize: "14px",
                   }),
                 }}
