@@ -22,6 +22,8 @@ export const getAuthors = async ({
       order: [["name", "ASC"]],
     });
   }
+  console.log(page,limit);
+  
 
   const offset = (page - 1) * limit;
 
@@ -33,6 +35,8 @@ export const getAuthors = async ({
       limit,
       offset,
     });
+    console.log("rows",rows);
+    
 
   return {
     authors: rows,

@@ -35,6 +35,7 @@ const BookList = () => {
       setLoading(true);
       const params = {
         page,
+        limit:5
       };
 
       if (debouncedSearch.trim()) {

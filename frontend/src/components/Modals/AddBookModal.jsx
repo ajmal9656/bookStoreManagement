@@ -4,7 +4,7 @@ import "../../styles/addBookModal.css";
 import useDebounce from "../../hook/useDebounce";
 import { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
-import { getAuthors } from "../../services/authorService";
+import { getAuthors } from "../../services/bookService";
 import Select from "react-select";
 
 const AddBookModal = ({ open, onClose, onSubmit }) => {
